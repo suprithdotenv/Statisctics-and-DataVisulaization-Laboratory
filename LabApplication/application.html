@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Probability Distributions: Industry Applications</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --ink: #172033;
+        --muted: #64748b;
+        --line: #e5eaf2;
+        --surface: #ffffff;
+        --canvas: #f4f6fb;
+        --brand: #3949ab;
+        --brand-dark: #26347f;
+        --brand-soft: #eef1ff;
+        --success: #0f8a68;
+        --danger: #c2415d;
+        --shadow: 0 12px 32px rgba(24, 39, 75, .065);
+      }
+      html { scroll-behavior: smooth; }
+      body {
+        background:
+          radial-gradient(ellipse at 8% 0%, rgba(99,102,241,.07), transparent 32rem),
+          var(--canvas) !important;
+        color: var(--ink) !important;
+        letter-spacing: -.01em;
+      }
+      header {
+        background: linear-gradient(112deg, #172554 0%, #293b85 52%, #3949ab 100%) !important;
+        box-shadow: 0 8px 28px rgba(23,37,84,.18) !important;
+        position: relative;
+        z-index: 5;
+      }
+      header > div { max-width: 1440px !important; padding-top: 1.1rem !important; padding-bottom: 1.1rem !important; gap: 1.25rem; }
+      header h1 { font-size: 1.12rem !important; font-weight: 750 !important; letter-spacing: -.025em !important; }
+      header nav { gap: .4rem !important; }
+      header nav button {
+        border: 1px solid rgba(255,255,255,.16);
+        border-radius: 9px !important;
+        padding: .58rem .86rem !important;
+        color: rgba(255,255,255,.82);
+        font-weight: 600 !important;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease;
+      }
+      header nav button:hover { background: rgba(255,255,255,.13) !important; color: #fff; transform: translateY(-1px); }
+      header nav button.bg-indigo-800 {
+        background: #fff !important;
+        color: #26347f !important;
+        border-color: #fff;
+        box-shadow: 0 3px 10px rgba(10,20,60,.12);
+      }
+      main { max-width: 1440px !important; padding-top: 2.2rem !important; padding-bottom: 3rem !important; }
+      section { animation: sectionIn .28s ease both; }
+      @keyframes sectionIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      main .bg-white {
+        background: var(--surface) !important;
+        border-color: var(--line) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--shadow) !important;
+      }
+      main section > .bg-white:first-child { padding: 1.65rem 1.8rem !important; }
+      main h2 { color: #172554 !important; letter-spacing: -.035em; line-height: 1.25; }
+      main h3 { letter-spacing: -.02em; }
+      main p { line-height: 1.7; }
+      #tab-home > .bg-white { padding: clamp(1.5rem, 3vw, 2.5rem) !important; }
+      #tab-home h2 { font-size: clamp(1.5rem, 2.4vw, 2rem) !important; }
+      #tab-home .grid > div {
+        border: 1px solid #e2e7f5 !important;
+        border-radius: 14px !important;
+        background: linear-gradient(145deg, #fbfcff, #f1f4ff) !important;
+        padding: 1.35rem !important;
+        min-height: 178px;
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      }
+      #tab-home .grid > div:hover {
+        transform: translateY(-3px);
+        border-color: #c5ccf4 !important;
+        box-shadow: 0 14px 28px rgba(49,65,140,.09);
+      }
+      #tab-home .grid h3 { font-size: 1rem !important; color: #243675 !important; }
+      #tab-home .grid button {
+        color: var(--brand) !important;
+        font-weight: 700 !important;
+        padding-top: .5rem;
+      }
+      #tab-home .grid button:hover { color: var(--brand-dark) !important; }
+      #tab-normal > .grid, #tab-exponential > .grid, #tab-clt > .grid { align-items: start; }
+      #tab-normal > .grid > div:first-child,
+      #tab-exponential > .grid > div:first-child,
+      #tab-clt > .grid > div:first-child { position: relative; }
+      #tab-normal h3.border-b, #tab-exponential h3.border-b, #tab-clt h3.border-b {
+        color: #243675 !important;
+        border-color: var(--line) !important;
+        padding-bottom: .9rem !important;
+        font-size: .98rem;
+      }
+      label { color: #475569 !important; letter-spacing: .035em; font-size: .68rem !important; }
+      input[type=number] {
+        background: #fbfcff !important;
+        border: 1px solid #d9e0ec !important;
+        border-radius: 9px !important;
+        min-height: 42px;
+        color: #172033 !important;
+        font-size: .9rem !important;
+        transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      }
+      input[type=number]:hover { border-color: #aeb9d3 !important; }
+      input[type=number]:focus {
+        background: #fff !important;
+        border-color: #6675d9 !important;
+        box-shadow: 0 0 0 3px rgba(79,94,190,.13) !important;
+        outline: none !important;
+      }
+      #normalChart, #exponentialChart, #cltChart { max-width: 100%; }
+      .relative.h-72 { height: 310px !important; }
+      main .lg\\:col-span-2 > .bg-white { padding: 1.45rem !important; }
+      main .lg\\:col-span-2 h3 { color: #24314d !important; font-size: 1rem !important; }
+      main .lg\\:col-span-2 .grid > div {
+        border-radius: 11px !important;
+        padding: 1rem !important;
+        min-height: 76px;
+      }
+      main .lg\\:col-span-2 .grid > div span:first-child {
+        font-size: .7rem !important;
+        line-height: 1.45;
+        margin-bottom: .4rem;
+      }
+      main .lg\\:col-span-2 .grid > div span:last-child {
+        font-size: 1.12rem !important;
+        font-weight: 750 !important;
+        letter-spacing: -.025em;
+        font-variant-numeric: tabular-nums;
+      }
+      #res-norm-acceptable, #res-exp-cdf, #res-clt-prob-below { color: #08795d !important; }
+      #res-norm-below, #res-norm-above { color: #b83250 !important; }
+      #res-exp-survival, #res-clt-prob-above { color: #a16207 !important; }
+      #res-norm-defect-rate {
+        display: block;
+        font-size: 1.35rem !important;
+        font-weight: 800 !important;
+        font-variant-numeric: tabular-nums;
+      }
+      #res-norm-interpretation, #res-exp-interpretation, #res-clt-interpretation {
+        background: #f8faff;
+        border: 1px solid #e6eaf5;
+        border-radius: 10px;
+        padding: .9rem 1rem;
+        color: #475569 !important;
+      }
+      #norm-validation, #exp-validation, #clt-validation {
+        border-radius: 9px !important;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+      footer { background: rgba(255,255,255,.82) !important; border-color: var(--line) !important; }
+      footer > div { max-width: 1440px !important; padding-top: 1.15rem !important; padding-bottom: 1.15rem !important; letter-spacing: .015em; }
+      @media (max-width: 640px) {
+        header > div { align-items: flex-start !important; }
+        header nav { width: 100%; }
+        header nav button { flex: 1 1 auto; font-size: .72rem !important; }
+        main { padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 1.25rem !important; }
+        main section > .bg-white:first-child { padding: 1.2rem !important; }
+        .relative.h-72 { height: 260px !important; }
+      }
+    </style>
+
+
+    <style id="indiana-theme-overrides">
+      :root {
+        --ink: #261b1b;
+        --muted: #756767;
+        --line: #eadfda;
+        --surface: #ffffff;
+        --canvas: #fbf8f5;
+        --brand: #990000;
+        --brand-dark: #760000;
+        --brand-soft: #fff1ed;
+        --cream: #fffaf2;
+        --shadow: 0 12px 32px rgba(91, 16, 16, .07);
+      }
+
+      body {
+        background:
+          radial-gradient(ellipse at 8% 0%, rgba(153,0,0,.065), transparent 34rem),
+          linear-gradient(180deg, #fffdf9 0%, #f8f3ee 100%) !important;
+        color: var(--ink) !important;
+      }
+
+      header {
+        background: linear-gradient(112deg, #650000 0%, #850000 54%, #990000 100%) !important;
+        box-shadow: 0 9px 28px rgba(91, 0, 0, .2) !important;
+      }
+      header h1 { color: var(--cream) !important; }
+      header nav button {
+        color: rgba(255,250,242,.88) !important;
+        border: 1px solid rgba(255,250,242,.28) !important;
+        background: rgba(255,250,242,.055) !important;
+        border-radius: 10px !important;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, background .2s ease, box-shadow .2s ease !important;
+      }
+      header nav button:hover {
+        color: #fff !important;
+        background: rgba(255,250,242,.16) !important;
+        border-color: rgba(255,250,242,.58) !important;
+        box-shadow: 0 5px 16px rgba(30,0,0,.2);
+        transform: translateY(-2px);
+      }
+      header nav button:active { transform: translateY(0) scale(.97); }
+      header nav button.bg-indigo-800 {
+        background: var(--cream) !important;
+        color: #850000 !important;
+        border-color: var(--cream) !important;
+        box-shadow: 0 4px 14px rgba(25,0,0,.2), inset 0 -2px 0 rgba(153,0,0,.08);
+      }
+
+      main .bg-white {
+        border-color: var(--line) !important;
+        box-shadow: 0 12px 32px rgba(91,16,16,.055) !important;
+      }
+      main h2 { color: #650000 !important; }
+      #tab-home .grid > div {
+        background: linear-gradient(145deg, #fffefa 0%, #fff5ef 100%) !important;
+        border-color: #eedbd2 !important;
+      }
+      #tab-home .grid > div:hover {
+        border-color: #d7aaa0 !important;
+        box-shadow: 0 15px 30px rgba(153,0,0,.10) !important;
+      }
+      #tab-home .grid h3,
+      #tab-normal h3.border-b,
+      #tab-exponential h3.border-b,
+      #tab-clt h3.border-b { color: #760000 !important; }
+
+      /* Primary module-launch buttons */
+      #tab-home .grid button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        width: fit-content;
+        padding: .68rem 1rem !important;
+        margin-top: .35rem;
+        border: 1px solid #990000 !important;
+        border-radius: 9px !important;
+        color: #fffaf2 !important;
+        background: linear-gradient(135deg, #a60000 0%, #760000 100%) !important;
+        box-shadow: 0 4px 10px rgba(153,0,0,.18);
+        font-weight: 700 !important;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        transition: transform .2s ease, box-shadow .2s ease, filter .2s ease !important;
+      }
+      #tab-home .grid button::before {
+        content: "";
+        position: absolute;
+        top: -80%;
+        left: -45%;
+        width: 34%;
+        height: 260%;
+        transform: rotate(24deg);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.34), transparent);
+        transition: left .55s ease;
+        z-index: -1;
+      }
+      #tab-home .grid button:hover {
+        color: #fff !important;
+        background: linear-gradient(135deg, #b00000 0%, #850000 100%) !important;
+        box-shadow: 0 9px 20px rgba(153,0,0,.27);
+        transform: translateY(-2px);
+        filter: saturate(1.08);
+      }
+      #tab-home .grid button:hover::before { left: 125%; }
+      #tab-home .grid button:active {
+        transform: translateY(0) scale(.97);
+        box-shadow: 0 3px 7px rgba(153,0,0,.2);
+      }
+
+      input[type=number] {
+        background: #fffdfa !important;
+        border-color: #e4d5cf !important;
+      }
+      input[type=number]:hover { border-color: #c99c91 !important; }
+      input[type=number]:focus {
+        border-color: #990000 !important;
+        box-shadow: 0 0 0 3px rgba(153,0,0,.12) !important;
+      }
+
+      /* Crimson/cream accents for live result panels */
+      #res-norm-defect-rate,
+      #res-exp-mean { color: #760000 !important; }
+      #res-norm-acceptable, #res-exp-cdf, #res-clt-prob-below { color: #14745c !important; }
+      #res-norm-below, #res-norm-above { color: #a11d35 !important; }
+      #res-exp-survival, #res-clt-prob-above { color: #98600a !important; }
+      #res-norm-interpretation, #res-exp-interpretation, #res-clt-interpretation {
+        background: #fffaf5 !important;
+        border-color: #efe2da !important;
+      }
+      footer {
+        background: rgba(255,250,242,.92) !important;
+        border-color: #eadfda !important;
+      }
+      footer > div { color: #806e68 !important; }
+
+      button:focus-visible {
+        outline: 3px solid rgba(153,0,0,.32) !important;
+        outline-offset: 3px !important;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          scroll-behavior: auto !important;
+          animation-duration: .01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: .01ms !important;
+        }
+      }
+    </style>
+
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight"><span style="display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;opacity:.68;font-weight:700;margin-bottom:.18rem">Interactive Learning Suite</span>Continuous Probability Distributions</h1>
+            <nav class="mt-3 sm:mt-0 flex flex-wrap gap-1">
+                <button onclick="switchTab('home')" id="btn-home" class="px-3 py-1.5 rounded-md text-sm font-medium bg-indigo-800 transition">Home</button>
+                <button onclick="switchTab('normal')" id="btn-normal" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition">1. Normal (Quality)</button>
+                <button onclick="switchTab('exponential')" id="btn-exponential" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition">2. Exponential (Cloud)</button>
+                <button onclick="switchTab('clt')" id="btn-clt" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition">3. CLT (Warehouse)</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+
+        <!-- HOME TAB -->
+        <section id="tab-home" class="space-y-6">
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-indigo-900 mb-3">Industry Applications for Undergraduate AIML Students</h2>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    Welcome to the interactive learning platform for continuous probability distributions. In Artificial Intelligence and Machine Learning, continuous probability models form the bedrock of data preprocessing, noise modeling, anomaly detection, probabilistic classifiers (like Gaussian Naive Bayes), and generative modeling.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-5 rounded-lg border border-indigo-100 bg-indigo-50/50 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-indigo-900 mb-2">1. Normal Distribution</h3>
+                            <p class="text-sm text-slate-600 mb-4">Applied in Manufacturing Quality Control to model dimensional variations and defect rates.</p>
+                        </div>
+                        <button onclick="switchTab('normal')" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 text-left">Launch Module &rarr;</button>
+                    </div>
+                    <div class="p-5 rounded-lg border border-indigo-100 bg-indigo-50/50 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-indigo-900 mb-2">2. Exponential Distribution</h3>
+                            <p class="text-sm text-slate-600 mb-4">Applied in Cloud Computing to model server request inter-arrival times and queueing dynamics.</p>
+                        </div>
+                        <button onclick="switchTab('exponential')" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 text-left">Launch Module &rarr;</button>
+                    </div>
+                    <div class="p-5 rounded-lg border border-indigo-100 bg-indigo-50/50 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-indigo-900 mb-2">3. Central Limit Theorem</h3>
+                            <p class="text-sm text-slate-600 mb-4">Applied in Warehouse Operations to analyze aggregate processing times and fulfillment distributions.</p>
+                        </div>
+                        <button onclick="switchTab('clt')" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 text-left">Launch Module &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NORMAL DISTRIBUTION MODULE -->
+        <section id="tab-normal" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Module 1: Normal Distribution — Manufacturing Quality Control</h2>
+                <p class="text-sm text-slate-600">
+                    Analyze precision manufacturing tolerances for machine shafts (Target: 10 mm). Adjust parameters below to calculate probabilities and view real-time defect rates.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Controls & Inputs -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-semibold text-slate-800 border-b pb-2">Input Parameters</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Mean Diameter ($\mu$ in mm)</label>
+                        <input type="number" id="norm-mu" value="10.0" step="0.01" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateNormalModule()">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Standard Deviation ($\sigma$ in mm)</label>
+                        <input type="number" id="norm-sigma" value="0.05" step="0.005" min="0.001" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateNormalModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Lower Spec Limit (LSL in mm)</label>
+                        <input type="number" id="norm-lsl" value="9.90" step="0.01" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateNormalModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upper Spec Limit (USL in mm)</label>
+                        <input type="number" id="norm-usl" value="10.10" step="0.01" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateNormalModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Evaluate Diameter ($x$ in mm)</label>
+                        <input type="number" id="norm-x" value="10.02" step="0.01" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateNormalModule()">
+                    </div>
+
+                    <div id="norm-validation" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-md"></div>
+                </div>
+
+                <!-- Visualization & Outputs -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-4">Probability Density Curve</h3>
+                        <div class="relative h-72 w-full">
+                            <canvas id="normalChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-3">Calculations & Results</h3>
+                        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-slate-500 block text-xs">PDF at $x$ ($f(x)$):</span>
+                                <span id="res-norm-pdf" class="font-semibold text-slate-800 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <span class="text-emerald-700 block text-xs">Acceptable Yield ($L \le X \le U$):</span>
+                                <span id="res-norm-acceptable" class="font-semibold text-emerald-900 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-rose-50 rounded-lg border border-rose-100">
+                                <span class="text-rose-700 block text-xs">Defective Below LSL ($X < L$):</span>
+                                <span id="res-norm-below" class="font-semibold text-rose-900 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-rose-50 rounded-lg border border-rose-100">
+                                <span class="text-rose-700 block text-xs">Defective Above USL ($X > U$):</span>
+                                <span id="res-norm-above" class="font-semibold text-rose-900 text-base">-</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                            <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wide mb-1">Expected Defect Rate</h4>
+                            <p id="res-norm-defect-rate" class="text-lg font-bold text-indigo-900">-</p>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Quality Control Interpretation</h4>
+                            <p id="res-norm-interpretation" class="text-sm text-slate-600 leading-relaxed">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPONENTIAL DISTRIBUTION MODULE -->
+        <section id="tab-exponential" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Module 2: Exponential Distribution — Cloud Request Inter-arrival Time</h2>
+                <p class="text-sm text-slate-600">
+                    Model web server or API request arrivals. The exponential distribution governs the time gap ($T$) between consecutive incoming requests in a Poisson process.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Controls & Inputs -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-semibold text-slate-800 border-b pb-2">Input Parameters</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Arrival Rate ($\lambda$ requests/sec)</label>
+                        <input type="number" id="exp-lambda" value="2.0" step="0.1" min="0.1" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateExponentialModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Target Threshold Time ($t$ in seconds)</label>
+                        <input type="number" id="exp-t" value="0.75" step="0.05" min="0.01" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateExponentialModule()">
+                    </div>
+
+                    <div id="exp-validation" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-md"></div>
+                </div>
+
+                <!-- Visualization & Outputs -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-4">Inter-arrival Time Density Curve</h3>
+                        <div class="relative h-72 w-full">
+                            <canvas id="exponentialChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-3">Calculations & Results</h3>
+                        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-slate-500 block text-xs">Mean Inter-arrival Time ($\mu = 1/\lambda$):</span>
+                                <span id="res-exp-mean" class="font-semibold text-slate-800 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-slate-500 block text-xs">PDF at $t$ ($f(t)$):</span>
+                                <span id="res-exp-pdf" class="font-semibold text-slate-800 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                                <span class="text-indigo-700 block text-xs">Prob. Inter-arrival $\le t$ ($P(T \le t)$):</span>
+                                <span id="res-exp-cdf" class="font-semibold text-indigo-900 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                                <span class="text-amber-700 block text-xs">Prob. Inter-arrival $> t$ ($P(T > t)$):</span>
+                                <span id="res-exp-survival" class="font-semibold text-amber-900 text-base">-</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Cloud Infrastructure Interpretation</h4>
+                            <p id="res-exp-interpretation" class="text-sm text-slate-600 leading-relaxed">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTRAL LIMIT THEOREM MODULE -->
+        <section id="tab-clt" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Module 3: Central Limit Theorem — Warehouse Processing Time</h2>
+                <p class="text-sm text-slate-600">
+                    Examine order fulfillment times. Regardless of individual order processing distribution skewness, the distribution of sample mean processing time ($\bar{X}$) approaches a Normal distribution as sample size $n$ increases.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Controls & Inputs -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-semibold text-slate-800 border-b pb-2">Input Parameters</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Population Mean ($\mu$ in mins)</label>
+                        <input type="number" id="clt-mu" value="15.0" step="0.5" min="1.0" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateCltModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Population Std Dev ($\sigma$ in mins)</label>
+                        <input type="number" id="clt-sigma" value="5.0" step="0.5" min="0.1" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateCltModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sample Size per Batch ($n$ orders)</label>
+                        <input type="number" id="clt-n" value="30" step="1" min="1" max="500" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateCltModule()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Target Mean Threshold ($\bar{x}$ in mins)</label>
+                        <input type="number" id="clt-target" value="16.5" step="0.1" class="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" oninput="updateCltModule()">
+                    </div>
+
+                    <div id="clt-validation" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-md"></div>
+                </div>
+
+                <!-- Visualization & Outputs -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-4">Sampling Distribution of Sample Mean ($\bar{X}$)</h3>
+                        <div class="relative h-72 w-full">
+                            <canvas id="cltChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-semibold text-slate-800 mb-3">Calculations & Results</h3>
+                        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-slate-500 block text-xs">Standard Error ($SE = \sigma / \sqrt{n}$):</span>
+                                <span id="res-clt-se" class="font-semibold text-slate-800 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-slate-500 block text-xs">Z-Score at Target:</span>
+                                <span id="res-clt-z" class="font-semibold text-slate-800 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                                <span class="text-indigo-700 block text-xs">Prob. Sample Mean $\le$ Target ($P(\bar{X} \le \bar{x})$):</span>
+                                <span id="res-clt-prob-below" class="font-semibold text-indigo-900 text-base">-</span>
+                            </div>
+                            <div class="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                                <span class="text-amber-700 block text-xs">Prob. Sample Mean $>$ Target ($P(\bar{X} > \bar{x})$):</span>
+                                <span id="res-clt-prob-above" class="font-semibold text-amber-900 text-base">-</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Warehouse Operations Interpretation</h4>
+                            <p id="res-clt-interpretation" class="text-sm text-slate-600 leading-relaxed">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            Continuous Probability Distributions Learning Tool &bull; Designed for AIML Undergraduate Curriculum
+        </div>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        let normalChartInstance = null;
+        let exponentialChartInstance = null;
+        let cltChartInstance = null;
+
+        function switchTab(tabId) {
+            ['home', 'normal', 'exponential', 'clt'].forEach(id => {
+                document.getElementById(`tab-${id}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-${id}`);
+                if (btn) {
+                    btn.className = "px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition";
+                }
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "px-3 py-1.5 rounded-md text-sm font-medium bg-indigo-800 transition";
+            }
+            
+            if (tabId === 'normal') updateNormalModule();
+            if (tabId === 'exponential') updateExponentialModule();
+            if (tabId === 'clt') updateCltModule();
+        }
+
+        // Shared Statistical Helpers
+        function erf(z) {
+            const t = 1.0 / (1.0 + 0.5 * Math.abs(z));
+            const tau = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+            return z >= 0 ? 1.0 - tau : tau - 1.0;
+        }
+
+        function normalCDF(x, mu, sigma) {
+            return 0.5 * (1.0 + erf((x - mu) / (sigma * Math.sqrt(2.0))));
+        }
+
+        function normalPDF(x, mu, sigma) {
+            const variance = sigma * sigma;
+            return (1.0 / (sigma * Math.sqrt(2.0 * Math.PI))) * Math.exp(-Math.pow(x - mu, 2) / (2.0 * variance));
+        }
+
+        // --- MODULE 1: NORMAL DISTRIBUTION ---
+        function updateNormalModule() {
+            const mu = parseFloat(document.getElementById('norm-mu').value);
+            const sigma = parseFloat(document.getElementById('norm-sigma').value);
+            const lsl = parseFloat(document.getElementById('norm-lsl').value);
+            const usl = parseFloat(document.getElementById('norm-usl').value);
+            const xVal = parseFloat(document.getElementById('norm-x').value);
+            const alertBox = document.getElementById('norm-validation');
+
+            if (sigma <= 0 || lsl >= usl) {
+                alertBox.classList.remove('hidden');
+                alertBox.textContent = "Error: Standard deviation must be greater than 0, and Lower Spec Limit must be less than Upper Spec Limit.";
+                return;
+            } else {
+                alertBox.classList.add('hidden');
+            }
+
+            const pdfAtX = normalPDF(xVal, mu, sigma);
+            const probBelow = normalCDF(lsl, mu, sigma);
+            const probAbove = 1.0 - normalCDF(usl, mu, sigma);
+            const probAcceptable = normalCDF(usl, mu, sigma) - normalCDF(lsl, mu, sigma);
+            const defectPercentage = (probBelow + probAbove) * 100.0;
+
+            document.getElementById('res-norm-pdf').textContent = `${pdfAtX.toFixed(4)}`;
+            document.getElementById('res-norm-acceptable').textContent = `${(probAcceptable * 100).toFixed(2)}%`;
+            document.getElementById('res-norm-below').textContent = `${(probBelow * 100).toFixed(4)}%`;
+            document.getElementById('res-norm-above').textContent = `${(probAbove * 100).toFixed(4)}%`;
+            document.getElementById('res-norm-defect-rate').textContent = `${defectPercentage.toFixed(4)}% (${(defectPercentage * 10000).toFixed(0)} ppm)`;
+
+            let interpretation = "";
+            if (defectPercentage < 0.27) {
+                interpretation = `Excellent process quality! With a defect rate of ${defectPercentage.toFixed(3)}%, the manufacturing process operates within stringent Six Sigma control limits.`;
+            } else if (defectPercentage < 5.0) {
+                interpretation = `Moderate quality performance. Expected defects are ${defectPercentage.toFixed(2)}%, indicating room for process centering or variance reduction.`;
+            } else {
+                interpretation = `High defect rate detected (${defectPercentage.toFixed(2)}%). The process spread is too wide relative to specifications or off-center. Tool calibration is recommended.`;
+            }
+            document.getElementById('res-norm-interpretation').textContent = interpretation;
+
+            renderNormalChart(mu, sigma, lsl, usl);
+        }
+
+        function renderNormalChart(mu, sigma, lsl, usl) {
+            const ctx = document.getElementById('normalChart').getContext('2d');
+            const start = mu - 4 * sigma;
+            const end = mu + 4 * sigma;
+            const steps = 100;
+            const stepSize = (end - start) / steps;
+
+            const labels = [];
+            const dataBelow = [], dataAcceptable = [], dataAbove = [];
+
+            for (let i = 0; i <= steps; i++) {
+                const x = start + i * stepSize;
+                labels.push(x.toFixed(2));
+                const y = normalPDF(x, mu, sigma);
+
+                if (x < lsl) {
+                    dataBelow.push(y); dataAcceptable.push(null); dataAbove.push(null);
+                } else if (x >= lsl && x <= usl) {
+                    dataBelow.push(null); dataAcceptable.push(y); dataAbove.push(null);
+                } else {
+                    dataBelow.push(null); dataAcceptable.push(null); dataAbove.push(y);
+                }
+            }
+
+            if (normalChartInstance) normalChartInstance.destroy();
+
+            normalChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Defective (< LSL)', data: dataBelow, borderColor: 'rgb(225, 29, 72)', backgroundColor: 'rgba(225, 29, 72, 0.2)', fill: true, tension: 0.3, pointRadius: 0 },
+                        { label: 'Acceptable Range', data: dataAcceptable, borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true, tension: 0.3, pointRadius: 0 },
+                        { label: 'Defective (> USL)', data: dataAbove, borderColor: 'rgb(225, 29, 72)', backgroundColor: 'rgba(225, 29, 72, 0.2)', fill: true, tension: 0.3, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Shaft Diameter (mm)' }, grid: { display: false } },
+                        y: { title: { display: true, text: 'Probability Density' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        // --- MODULE 2: EXPONENTIAL DISTRIBUTION ---
+        function updateExponentialModule() {
+            const lambda = parseFloat(document.getElementById('exp-lambda').value);
+            const t = parseFloat(document.getElementById('exp-t').value);
+            const alertBox = document.getElementById('exp-validation');
+
+            if (lambda <= 0 || t < 0) {
+                alertBox.classList.remove('hidden');
+                alertBox.textContent = "Error: Arrival rate (lambda) must be greater than 0, and threshold time must be non-negative.";
+                return;
+            } else {
+                alertBox.classList.add('hidden');
+            }
+
+            const mean = 1.0 / lambda;
+            const pdfAtT = lambda * Math.exp(-lambda * t);
+            const cdfAtT = 1.0 - Math.exp(-lambda * t);
+            const survival = Math.exp(-lambda * t);
+
+            document.getElementById('res-exp-mean').textContent = `${mean.toFixed(3)} sec`;
+            document.getElementById('res-exp-pdf').textContent = `${pdfAtT.toFixed(4)}`;
+            document.getElementById('res-exp-cdf').textContent = `${(cdfAtT * 100).toFixed(2)}%`;
+            document.getElementById('res-exp-survival').textContent = `${(survival * 100).toFixed(2)}%`;
+
+            let interpretation = "";
+            if (cdfAtT > 0.8) {
+                interpretation = `High frequency traffic! There is a ${(cdfAtT * 100).toFixed(1)}% chance that the next request arrives within ${t} seconds, indicating high server load and tight queuing intervals.`;
+            } else if (cdfAtT < 0.3) {
+                interpretation = `Low frequency traffic. There is a ${(survival * 100).toFixed(1)}% chance that requests take longer than ${t} seconds to arrive, characteristic of sparse API access or off-peak hours.`;
+            } else {
+                interpretation = `Moderate arrival cadence. Average inter-arrival time is ${mean.toFixed(2)} seconds, balancing server capacity and idle time effectively.`;
+            }
+            document.getElementById('res-exp-interpretation').textContent = interpretation;
+
+            renderExponentialChart(lambda, t);
+        }
+
+        function renderExponentialChart(lambda, targetT) {
+            const ctx = document.getElementById('exponentialChart').getContext('2d');
+            const maxT = Math.max(5.0 / lambda, targetT * 1.5);
+            const steps = 100;
+            const stepSize = maxT / steps;
+
+            const labels = [];
+            const dataUnder = [], dataOver = [];
+
+            for (let i = 0; i <= steps; i++) {
+                const t = i * stepSize;
+                labels.push(t.toFixed(2));
+                const y = lambda * Math.exp(-lambda * t);
+
+                if (t <= targetT) {
+                    dataUnder.push(y); dataOver.push(null);
+                } else {
+                    dataUnder.push(null); dataOver.push(y);
+                }
+            }
+
+            if (exponentialChartInstance) exponentialChartInstance.destroy();
+
+            exponentialChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: `Arrival within t (${( (1 - Math.exp(-lambda * targetT))*100 ).toFixed(1)}%)`, data: dataUnder, borderColor: 'rgb(79, 70, 229)', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true, tension: 0.3, pointRadius: 0 },
+                        { label: `Arrival > t (${( (Math.exp(-lambda * targetT))*100 ).toFixed(1)}%)`, data: dataOver, borderColor: 'rgb(245, 158, 11)', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Inter-arrival Time t (seconds)' }, grid: { display: false } },
+                        y: { title: { display: true, text: 'Probability Density f(t)' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        // --- MODULE 3: CENTRAL LIMIT THEOREM ---
+        function updateCltModule() {
+            const mu = parseFloat(document.getElementById('clt-mu').value);
+            const sigma = parseFloat(document.getElementById('clt-sigma').value);
+            const n = parseInt(document.getElementById('clt-n').value);
+            const target = parseFloat(document.getElementById('clt-target').value);
+            const alertBox = document.getElementById('clt-validation');
+
+            if (sigma <= 0 || n <= 0) {
+                alertBox.classList.remove('hidden');
+                alertBox.textContent = "Error: Standard deviation and sample size must be greater than 0.";
+                return;
+            } else {
+                alertBox.classList.add('hidden');
+            }
+
+            const se = sigma / Math.sqrt(n);
+            const z = (target - mu) / se;
+            const probBelow = normalCDF(target, mu, se);
+            const probAbove = 1.0 - probBelow;
+
+            document.getElementById('res-clt-se').textContent = `${se.toFixed(3)} mins`;
+            document.getElementById('res-clt-z').textContent = `${z.toFixed(2)}`;
+            document.getElementById('res-clt-prob-below').textContent = `${(probBelow * 100).toFixed(2)}%`;
+            document.getElementById('res-clt-prob-above').textContent = `${(probAbove * 100).toFixed(2)}%`;
+
+            let interpretation = "";
+            if (probBelow > 0.95) {
+                interpretation = `High confidence! There is a ${(probBelow * 100).toFixed(1)}% probability that batch average fulfillment time stays under ${target} minutes, making SLA compliance extremely reliable for sample size n = ${n}.`;
+            } else if (probBelow < 0.05) {
+                interpretation = `Low likelihood of meeting target. Only ${(probBelow * 100).toFixed(1)}% chance batch mean is under ${target} minutes. Processing bottlenecks require workflow optimization.`;
+            } else {
+                interpretation = `Balanced risk profile. There is a ${(probBelow * 100).toFixed(1)}% chance average batch processing time stays below ${target} mins, illustrating how sample aggregation standardizes variance (SE = ${se.toFixed(2)}).`;
+            }
+            document.getElementById('res-clt-interpretation').textContent = interpretation;
+
+            renderCltChart(mu, se, target);
+        }
+
+        function renderCltChart(mu, se, target) {
+            const ctx = document.getElementById('cltChart').getContext('2d');
+            const start = mu - 4 * se;
+            const end = mu + 4 * se;
+            const steps = 100;
+            const stepSize = (end - start) / steps;
+
+            const labels = [];
+            const dataBelow = [], dataAbove = [];
+
+            for (let i = 0; i <= steps; i++) {
+                const x = start + i * stepSize;
+                labels.push(x.toFixed(2));
+                const y = normalPDF(x, mu, se);
+
+                if (x <= target) {
+                    dataBelow.push(y); dataAbove.push(null);
+                } else {
+                    dataBelow.push(null); dataAbove.push(y);
+                }
+            }
+
+            if (cltChartInstance) cltChartInstance.destroy();
+
+            cltChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: `Sample Mean <= Target (${(normalCDF(target, mu, se)*100).toFixed(1)}%)`, data: dataBelow, borderColor: 'rgb(79, 70, 229)', backgroundColor: 'rgba(79, 70, 229, 0.2)', fill: true, tension: 0.3, pointRadius: 0 },
+                        { label: `Sample Mean > Target (${((1-normalCDF(target, mu, se))*100).toFixed(1)}%)`, data: dataAbove, borderColor: 'rgb(245, 158, 11)', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Sample Mean Order Fulfillment Time (minutes)' }, grid: { display: false } },
+                        y: { title: { display: true, text: 'Sampling Density' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        // Initial load
+        window.onload = function() {
+            switchTab('home');
+        };
+    </script>
+</body>
+</html>
